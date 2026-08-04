@@ -356,3 +356,4 @@ All errors are handled by `@RestControllerAdvice` (`GlobalExceptionHandler`) and
 ## 📦 Postman Collection
 
 Import `postman_collection.json` located at the root of the project into Postman to immediately execute all 10 preconfigured CRUD requests.
+ ---------
