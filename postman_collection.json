@@ -1,0 +1,193 @@
+{
+  "info": {
+    "_postman_id": "8f8b3c10-53e7-4b76-a076-employee-management-system",
+    "name": "Employee Management System API",
+    "description": "Complete Postman collection for Employee and Department CRUD APIs implementing layered architecture (Controller -> Service -> DAO -> Repository -> MySQL).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Departments",
+      "item": [
+        {
+          "name": "1. Create Department (POST /api/departments)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"deptName\": \"Engineering\",\n  \"location\": \"San Francisco, CA\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/departments",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "departments"]
+            },
+            "description": "Creates a new department and returns HTTP 201 Created."
+          }
+        },
+        {
+          "name": "2. Get Department by ID (GET /api/departments/:id)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/departments/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "departments", "1"]
+            },
+            "description": "Retrieves a department by ID and returns HTTP 200 OK (or 404 if not found)."
+          }
+        },
+        {
+          "name": "3. Update Department (PUT /api/departments/:id)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"deptName\": \"Software Engineering & Infrastructure\",\n  \"location\": \"San Francisco, CA\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/departments/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "departments", "1"]
+            },
+            "description": "Updates an existing department and returns HTTP 200 OK."
+          }
+        },
+        {
+          "name": "4. List All Departments (GET /api/departments)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/departments",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "departments"]
+            },
+            "description": "Returns a list of all departments."
+          }
+        },
+        {
+          "name": "5. Delete Department (DELETE /api/departments/:id)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/departments/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "departments", "1"]
+            },
+            "description": "Deletes a department and returns HTTP 204 No Content."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Employees",
+      "item": [
+        {
+          "name": "1. Create Employee (POST /api/employees)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"empName\": \"Alice Johnson\",\n  \"email\": \"alice.johnson@example.com\",\n  \"salary\": 95000.00,\n  \"department\": {\n    \"deptId\": 1\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/employees",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "employees"]
+            },
+            "description": "Creates a new employee assigned to a department and returns HTTP 201 Created."
+          }
+        },
+        {
+          "name": "2. Get Employee by ID (GET /api/employees/:id)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/employees/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "employees", "1"]
+            },
+            "description": "Retrieves an employee by ID and returns HTTP 200 OK (or 404 if not found)."
+          }
+        },
+        {
+          "name": "3. Update Employee (PUT /api/employees/:id)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"empName\": \"Alice Johnson\",\n  \"email\": \"alice.johnson@example.com\",\n  \"salary\": 105000.00,\n  \"department\": {\n    \"deptId\": 1\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/employees/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "employees", "1"]
+            },
+            "description": "Updates an existing employee and returns HTTP 200 OK."
+          }
+        },
+        {
+          "name": "4. List All Employees (GET /api/employees)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/employees",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "employees"]
+            },
+            "description": "Returns a list of all employees."
+          }
+        },
+        {
+          "name": "5. Delete Employee (DELETE /api/employees/:id)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/employees/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "employees", "1"]
+            },
+            "description": "Deletes an employee by ID and returns HTTP 204 No Content."
+          }
+        }
+      ]
+    }
+  ]
+}
