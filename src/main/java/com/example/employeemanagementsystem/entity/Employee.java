@@ -1,29 +1,12 @@
 package com.example.employeemanagementsystem.entity;
 
-import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSetter;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.Size;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 
 import java.util.Objects;
 
-/**
- * Entity representing an Employee.
- * Mapped to 'employees' table in MySQL.
- */
 @Entity
 @Table(name = "employees")
 public class Employee {
@@ -34,8 +17,8 @@ public class Employee {
     private int empId;
 
     @NotBlank(message = "Employee name is required")
-    @Size(min = 2, max = 100, message = "Employee name must be between 2 and 100 characters")
-    @Column(name = "emp_name", nullable = false)
+    @Size(max = 100, message = "Employee name must not exceed 100 characters")
+    @Column(name = "emp_name", nullable = false, length = 100)
     private String empName;
 
     @NotBlank(message = "Email is required")
@@ -43,6 +26,7 @@ public class Employee {
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
+    @NotNull(message = "Salary is required")
     @Positive(message = "Salary must be greater than 0")
     @Column(name = "salary", nullable = false)
     private double salary;
@@ -52,11 +36,19 @@ public class Employee {
     @JsonIgnoreProperties("employees")
     private Department department;
 
-    // Default Constructor
+    @Transient
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private Integer deptId;
+
     public Employee() {
     }
 
-    // Parameterized Constructor without ID
+    public Employee(String empName, String email, double salary) {
+        this.empName = empName;
+        this.email = email;
+        this.salary = salary;
+    }
+
     public Employee(String empName, String email, double salary, Department department) {
         this.empName = empName;
         this.email = email;
@@ -64,7 +56,6 @@ public class Employee {
         this.department = department;
     }
 
-    // Parameterized Constructor with all fields
     public Employee(int empId, String empName, String email, double salary, Department department) {
         this.empId = empId;
         this.empName = empName;
@@ -73,15 +64,6 @@ public class Employee {
         this.department = department;
     }
 
-    // Parameterized Constructor with primitive fields
-    public Employee(int empId, String empName, String email, double salary) {
-        this.empId = empId;
-        this.empName = empName;
-        this.email = email;
-        this.salary = salary;
-    }
-
-    // Getters and Setters
     public int getEmpId() {
         return empId;
     }
@@ -90,30 +72,12 @@ public class Employee {
         this.empId = empId;
     }
 
-    // Alias id getter/setter for compatibility
-    public int getId() {
-        return empId;
-    }
-
-    public void setId(int id) {
-        this.empId = id;
-    }
-
     public String getEmpName() {
         return empName;
     }
 
     public void setEmpName(String empName) {
         this.empName = empName;
-    }
-
-    // Alias name getter/setter for compatibility
-    public String getName() {
-        return empName;
-    }
-
-    public void setName(String name) {
-        this.empName = name;
     }
 
     public String getEmail() {
@@ -140,25 +104,18 @@ public class Employee {
         this.department = department;
     }
 
-    /**
-     * Helper to read deptId directly from associated Department if present.
-     */
-    @JsonGetter("deptId")
     public Integer getDeptId() {
-        return (department != null) ? department.getDeptId() : null;
+        if (this.deptId != null) {
+            return this.deptId;
+        }
+        if (this.department != null) {
+            return this.department.getDeptId();
+        }
+        return null;
     }
 
-    /**
-     * Helper to allow setting deptId directly from JSON payloads.
-     */
-    @JsonSetter("deptId")
     public void setDeptId(Integer deptId) {
-        if (deptId != null && deptId > 0) {
-            if (this.department == null) {
-                this.department = new Department();
-            }
-            this.department.setDeptId(deptId);
-        }
+        this.deptId = deptId;
     }
 
     @Override
@@ -166,8 +123,10 @@ public class Employee {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Employee employee = (Employee) o;
-        return empId == employee.empId && Double.compare(employee.salary, salary) == 0 &&
-                Objects.equals(empName, employee.empName) && Objects.equals(email, employee.email);
+        return empId == employee.empId &&
+                Double.compare(employee.salary, salary) == 0 &&
+                Objects.equals(empName, employee.empName) &&
+                Objects.equals(email, employee.email);
     }
 
     @Override
@@ -182,7 +141,7 @@ public class Employee {
                 ", empName='" + empName + '\'' +
                 ", email='" + email + '\'' +
                 ", salary=" + salary +
-                ", department=" + (department != null ? department.getDeptName() : "null") +
+                ", department=" + (department != null ? department.getDeptName() : null) +
                 '}';
     }
 }

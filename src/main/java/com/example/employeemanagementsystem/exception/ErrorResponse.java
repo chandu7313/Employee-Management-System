@@ -6,9 +6,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import java.time.LocalDateTime;
 import java.util.Map;
 
-/**
- * Standard API error response payload.
- */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ErrorResponse {
 
@@ -41,7 +38,6 @@ public class ErrorResponse {
         this.validationErrors = validationErrors;
     }
 
-    // Getters and Setters
     public LocalDateTime getTimestamp() {
         return timestamp;
     }

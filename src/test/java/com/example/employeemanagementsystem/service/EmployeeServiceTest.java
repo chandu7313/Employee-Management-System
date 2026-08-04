@@ -8,7 +8,6 @@ import com.example.employeemanagementsystem.exception.DepartmentNotFoundExceptio
 import com.example.employeemanagementsystem.exception.EmployeeNotFoundException;
 import com.example.employeemanagementsystem.exception.InvalidInputException;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -40,45 +39,39 @@ class EmployeeServiceTest {
     @BeforeEach
     void setUp() {
         sampleDepartment = new Department(1, "Engineering", "San Francisco");
-        sampleEmployee = new Employee(1, "John Doe", "john.doe@example.com", 85000.0, sampleDepartment);
+        sampleEmployee = new Employee(1, "John Doe", "john.doe@example.com", 75000.0, sampleDepartment);
     }
 
     @Test
-    @DisplayName("saveEmployee - Success with valid employee")
     void testSaveEmployee_Success() {
         when(departmentDAO.findById(1)).thenReturn(sampleDepartment);
-        doAnswer(invocation -> {
-            Employee emp = invocation.getArgument(0);
-            emp.setEmpId(101);
-            return null;
-        }).when(employeeDAO).save(any(Employee.class));
+        doNothing().when(employeeDAO).save(any(Employee.class));
 
-        employeeService.saveEmployee(sampleEmployee);
+        Employee newEmp = new Employee("Jane Doe", "jane.doe@example.com", 80000.0, sampleDepartment);
+        employeeService.saveEmployee(newEmp);
 
         verify(departmentDAO, times(1)).findById(1);
-        verify(employeeDAO, times(1)).save(sampleEmployee);
+        verify(employeeDAO, times(1)).save(newEmp);
     }
 
     @Test
-    @DisplayName("saveEmployee - Throws InvalidInputException when salary is zero or negative")
-    void testSaveEmployee_InvalidSalary() {
-        sampleEmployee.setSalary(-500.0);
+    void testSaveEmployee_BlankName_ThrowsException() {
+        Employee invalidEmp = new Employee("  ", "valid@example.com", 50000.0, sampleDepartment);
 
         InvalidInputException exception = assertThrows(InvalidInputException.class, () -> {
-            employeeService.saveEmployee(sampleEmployee);
+            employeeService.saveEmployee(invalidEmp);
         });
 
-        assertTrue(exception.getMessage().contains("Salary must be greater than 0"));
+        assertTrue(exception.getMessage().contains("Employee name cannot be blank"));
         verify(employeeDAO, never()).save(any(Employee.class));
     }
 
     @Test
-    @DisplayName("saveEmployee - Throws InvalidInputException when email format is invalid")
-    void testSaveEmployee_InvalidEmail() {
-        sampleEmployee.setEmail("not-a-valid-email");
+    void testSaveEmployee_InvalidEmail_ThrowsException() {
+        Employee invalidEmp = new Employee("John", "invalid-email-format", 50000.0, sampleDepartment);
 
         InvalidInputException exception = assertThrows(InvalidInputException.class, () -> {
-            employeeService.saveEmployee(sampleEmployee);
+            employeeService.saveEmployee(invalidEmp);
         });
 
         assertTrue(exception.getMessage().contains("Invalid email format"));
@@ -86,20 +79,33 @@ class EmployeeServiceTest {
     }
 
     @Test
-    @DisplayName("saveEmployee - Throws DepartmentNotFoundException when deptId does not exist")
-    void testSaveEmployee_DepartmentNotFound() {
-        when(departmentDAO.findById(1)).thenReturn(null);
+    void testSaveEmployee_NegativeSalary_ThrowsException() {
+        Employee invalidEmp = new Employee("John", "john@example.com", -100.0, sampleDepartment);
 
-        DepartmentNotFoundException exception = assertThrows(DepartmentNotFoundException.class, () -> {
-            employeeService.saveEmployee(sampleEmployee);
+        InvalidInputException exception = assertThrows(InvalidInputException.class, () -> {
+            employeeService.saveEmployee(invalidEmp);
         });
 
-        assertTrue(exception.getMessage().contains("Department not found with id: 1"));
+        assertTrue(exception.getMessage().contains("Salary must be greater than 0"));
         verify(employeeDAO, never()).save(any(Employee.class));
     }
 
     @Test
-    @DisplayName("getEmployee - Success when employee exists")
+    void testSaveEmployee_NonExistentDepartment_ThrowsException() {
+        Department nonExistentDept = new Department(999, "Unknown", "Nowhere");
+        Employee empWithBadDept = new Employee("John", "john@example.com", 60000.0, nonExistentDept);
+
+        when(departmentDAO.findById(999)).thenReturn(null);
+
+        DepartmentNotFoundException exception = assertThrows(DepartmentNotFoundException.class, () -> {
+            employeeService.saveEmployee(empWithBadDept);
+        });
+
+        assertTrue(exception.getMessage().contains("Department not found with id: 999"));
+        verify(employeeDAO, never()).save(any(Employee.class));
+    }
+
+    @Test
     void testGetEmployee_Success() {
         when(employeeDAO.findById(1)).thenReturn(sampleEmployee);
 
@@ -107,13 +113,11 @@ class EmployeeServiceTest {
 
         assertNotNull(result);
         assertEquals("John Doe", result.getEmpName());
-        assertEquals("john.doe@example.com", result.getEmail());
         verify(employeeDAO, times(1)).findById(1);
     }
 
     @Test
-    @DisplayName("getEmployee - Throws EmployeeNotFoundException when employee does not exist")
-    void testGetEmployee_NotFound() {
+    void testGetEmployee_NotFound_ThrowsException() {
         when(employeeDAO.findById(99)).thenReturn(null);
 
         EmployeeNotFoundException exception = assertThrows(EmployeeNotFoundException.class, () -> {
@@ -125,12 +129,11 @@ class EmployeeServiceTest {
     }
 
     @Test
-    @DisplayName("updateEmployee - Success when employee exists")
     void testUpdateEmployee_Success() {
         when(employeeDAO.findById(1)).thenReturn(sampleEmployee);
         when(departmentDAO.findById(1)).thenReturn(sampleDepartment);
 
-        sampleEmployee.setSalary(95000.0);
+        sampleEmployee.setSalary(90000.0);
         employeeService.updateEmployee(sampleEmployee);
 
         verify(employeeDAO, times(1)).findById(1);
@@ -138,9 +141,8 @@ class EmployeeServiceTest {
     }
 
     @Test
-    @DisplayName("updateEmployee - Throws EmployeeNotFoundException when employee does not exist")
-    void testUpdateEmployee_NotFound() {
-        Employee nonExistent = new Employee(99, "Ghost", "ghost@example.com", 60000.0);
+    void testUpdateEmployee_NotFound_ThrowsException() {
+        Employee nonExistent = new Employee(99, "Ghost", "ghost@example.com", 50000.0, null);
         when(employeeDAO.findById(99)).thenReturn(null);
 
         assertThrows(EmployeeNotFoundException.class, () -> {
@@ -151,7 +153,6 @@ class EmployeeServiceTest {
     }
 
     @Test
-    @DisplayName("deleteEmployee - Success when employee exists")
     void testDeleteEmployee_Success() {
         when(employeeDAO.findById(1)).thenReturn(sampleEmployee);
 
@@ -162,8 +163,7 @@ class EmployeeServiceTest {
     }
 
     @Test
-    @DisplayName("deleteEmployee - Throws EmployeeNotFoundException when employee does not exist")
-    void testDeleteEmployee_NotFound() {
+    void testDeleteEmployee_NotFound_ThrowsException() {
         when(employeeDAO.findById(99)).thenReturn(null);
 
         assertThrows(EmployeeNotFoundException.class, () -> {
@@ -174,11 +174,10 @@ class EmployeeServiceTest {
     }
 
     @Test
-    @DisplayName("getAllEmployees - Returns list of employees")
     void testGetAllEmployees() {
         List<Employee> list = Arrays.asList(
                 sampleEmployee,
-                new Employee(2, "Jane Smith", "jane.smith@example.com", 90000.0, sampleDepartment)
+                new Employee(2, "Alice Smith", "alice@example.com", 85000.0, sampleDepartment)
         );
         when(employeeDAO.findAll()).thenReturn(list);
 

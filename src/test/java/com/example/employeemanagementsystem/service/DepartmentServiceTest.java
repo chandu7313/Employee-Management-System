@@ -5,7 +5,6 @@ import com.example.employeemanagementsystem.entity.Department;
 import com.example.employeemanagementsystem.exception.DepartmentNotFoundException;
 import com.example.employeemanagementsystem.exception.InvalidInputException;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -36,7 +35,6 @@ class DepartmentServiceTest {
     }
 
     @Test
-    @DisplayName("saveDepartment - Success with valid department")
     void testSaveDepartment_Success() {
         doNothing().when(departmentDAO).save(any(Department.class));
 
@@ -46,7 +44,6 @@ class DepartmentServiceTest {
     }
 
     @Test
-    @DisplayName("saveDepartment - Throws InvalidInputException when deptName is blank")
     void testSaveDepartment_BlankName() {
         Department invalid = new Department(0, "  ", "Chicago");
 
@@ -59,7 +56,6 @@ class DepartmentServiceTest {
     }
 
     @Test
-    @DisplayName("saveDepartment - Throws InvalidInputException when location is blank")
     void testSaveDepartment_BlankLocation() {
         Department invalid = new Department(0, "Finance", "  ");
 
@@ -72,7 +68,6 @@ class DepartmentServiceTest {
     }
 
     @Test
-    @DisplayName("getDepartment - Success when department exists")
     void testGetDepartment_Success() {
         when(departmentDAO.findById(1)).thenReturn(sampleDepartment);
 
@@ -84,7 +79,6 @@ class DepartmentServiceTest {
     }
 
     @Test
-    @DisplayName("getDepartment - Throws DepartmentNotFoundException when not found")
     void testGetDepartment_NotFound() {
         when(departmentDAO.findById(99)).thenReturn(null);
 
@@ -97,7 +91,6 @@ class DepartmentServiceTest {
     }
 
     @Test
-    @DisplayName("updateDepartment - Success when department exists")
     void testUpdateDepartment_Success() {
         when(departmentDAO.findById(1)).thenReturn(sampleDepartment);
 
@@ -109,7 +102,6 @@ class DepartmentServiceTest {
     }
 
     @Test
-    @DisplayName("updateDepartment - Throws DepartmentNotFoundException when not found")
     void testUpdateDepartment_NotFound() {
         Department nonExistent = new Department(99, "Unknown", "Unknown");
         when(departmentDAO.findById(99)).thenReturn(null);
@@ -122,7 +114,6 @@ class DepartmentServiceTest {
     }
 
     @Test
-    @DisplayName("deleteDepartment - Success when department exists")
     void testDeleteDepartment_Success() {
         when(departmentDAO.findById(1)).thenReturn(sampleDepartment);
 
@@ -133,7 +124,6 @@ class DepartmentServiceTest {
     }
 
     @Test
-    @DisplayName("deleteDepartment - Throws DepartmentNotFoundException when not found")
     void testDeleteDepartment_NotFound() {
         when(departmentDAO.findById(99)).thenReturn(null);
 
@@ -145,7 +135,6 @@ class DepartmentServiceTest {
     }
 
     @Test
-    @DisplayName("getAllDepartments - Returns list of departments")
     void testGetAllDepartments() {
         List<Department> list = Arrays.asList(
                 sampleDepartment,

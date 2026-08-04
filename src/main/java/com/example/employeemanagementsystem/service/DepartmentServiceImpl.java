@@ -4,22 +4,16 @@ import com.example.employeemanagementsystem.dao.DepartmentDAO;
 import com.example.employeemanagementsystem.entity.Department;
 import com.example.employeemanagementsystem.exception.DepartmentNotFoundException;
 import com.example.employeemanagementsystem.exception.InvalidInputException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-/**
- * Service implementation for Department business operations.
- * Implements business validation and transaction management, delegating persistence to DepartmentDAO.
- */
 @Service
 public class DepartmentServiceImpl implements DepartmentService {
 
     private final DepartmentDAO departmentDAO;
 
-    @Autowired
     public DepartmentServiceImpl(DepartmentDAO departmentDAO) {
         this.departmentDAO = departmentDAO;
     }
@@ -36,7 +30,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     public Department getDepartment(int id) {
         Department dept = departmentDAO.findById(id);
         if (dept == null) {
-            throw new DepartmentNotFoundException(id);
+            throw new DepartmentNotFoundException("Department not found with id: " + id);
         }
         return dept;
     }
@@ -44,16 +38,14 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Override
     @Transactional
     public void updateDepartment(Department dept) {
-        if (dept == null) {
-            throw new InvalidInputException("Department data cannot be null");
-        }
+        validateDepartment(dept);
         Department existing = departmentDAO.findById(dept.getDeptId());
         if (existing == null) {
-            throw new DepartmentNotFoundException(dept.getDeptId());
+            throw new DepartmentNotFoundException("Department not found with id: " + dept.getDeptId());
         }
-
-        validateDepartment(dept);
-        departmentDAO.update(dept);
+        existing.setDeptName(dept.getDeptName());
+        existing.setLocation(dept.getLocation());
+        departmentDAO.update(existing);
     }
 
     @Override
@@ -61,7 +53,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     public void deleteDepartment(int id) {
         Department existing = departmentDAO.findById(id);
         if (existing == null) {
-            throw new DepartmentNotFoundException(id);
+            throw new DepartmentNotFoundException("Department not found with id: " + id);
         }
         departmentDAO.delete(id);
     }
@@ -74,7 +66,7 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     private void validateDepartment(Department dept) {
         if (dept == null) {
-            throw new InvalidInputException("Department data cannot be null");
+            throw new InvalidInputException("Department payload cannot be null");
         }
         if (dept.getDeptName() == null || dept.getDeptName().trim().isEmpty()) {
             throw new InvalidInputException("Department name cannot be blank");

@@ -1,14 +1,7 @@
 package com.example.employeemanagementsystem.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
@@ -16,10 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Entity representing a Department.
- * Mapped to 'departments' table in MySQL.
- */
 @Entity
 @Table(name = "departments")
 public class Department {
@@ -30,30 +19,27 @@ public class Department {
     private int deptId;
 
     @NotBlank(message = "Department name is required")
-    @Size(min = 2, max = 100, message = "Department name must be between 2 and 100 characters")
-    @Column(name = "dept_name", nullable = false)
+    @Size(max = 100, message = "Department name must not exceed 100 characters")
+    @Column(name = "dept_name", nullable = false, length = 100)
     private String deptName;
 
-    @NotBlank(message = "Location is required")
-    @Size(min = 2, max = 100, message = "Location must be between 2 and 100 characters")
-    @Column(name = "location", nullable = false)
+    @NotBlank(message = "Department location is required")
+    @Size(max = 100, message = "Location must not exceed 100 characters")
+    @Column(name = "location", nullable = false, length = 100)
     private String location;
 
-    @OneToMany(mappedBy = "department", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "department", cascade = CascadeType.ALL, orphanRemoval = false, fetch = FetchType.LAZY)
     @JsonIgnoreProperties("department")
     private List<Employee> employees = new ArrayList<>();
 
-    // Default Constructor
     public Department() {
     }
 
-    // Parameterized Constructor without ID & employees
     public Department(String deptName, String location) {
         this.deptName = deptName;
         this.location = location;
     }
 
-    // Parameterized Constructor with all fields
     public Department(int deptId, String deptName, String location) {
         this.deptId = deptId;
         this.deptName = deptName;
@@ -67,7 +53,6 @@ public class Department {
         this.employees = employees != null ? employees : new ArrayList<>();
     }
 
-    // Getters and Setters
     public int getDeptId() {
         return deptId;
     }
@@ -100,18 +85,16 @@ public class Department {
         this.employees = employees;
     }
 
-    // Helper methods for bidirectional synchronization
     public void addEmployee(Employee employee) {
-        if (employees == null) {
-            employees = new ArrayList<>();
+        if (employee != null) {
+            this.employees.add(employee);
+            employee.setDepartment(this);
         }
-        employees.add(employee);
-        employee.setDepartment(this);
     }
 
     public void removeEmployee(Employee employee) {
-        if (employees != null) {
-            employees.remove(employee);
+        if (employee != null) {
+            this.employees.remove(employee);
             employee.setDepartment(null);
         }
     }
@@ -121,7 +104,9 @@ public class Department {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Department that = (Department) o;
-        return deptId == that.deptId && Objects.equals(deptName, that.deptName) && Objects.equals(location, that.location);
+        return deptId == that.deptId &&
+                Objects.equals(deptName, that.deptName) &&
+                Objects.equals(location, that.location);
     }
 
     @Override

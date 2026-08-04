@@ -4,15 +4,10 @@ import com.example.employeemanagementsystem.entity.Employee;
 import com.example.employeemanagementsystem.repository.EmployeeRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-/**
- * Implementation of EmployeeDAO interface.
- * Wraps Spring Data JPA EmployeeRepository and EntityManager operations.
- */
 @Repository
 public class EmployeeDAOImpl implements EmployeeDAO {
 
@@ -21,17 +16,15 @@ public class EmployeeDAOImpl implements EmployeeDAO {
     @PersistenceContext
     private EntityManager entityManager;
 
-    @Autowired
     public EmployeeDAOImpl(EmployeeRepository employeeRepository) {
         this.employeeRepository = employeeRepository;
     }
 
     @Override
     public void save(Employee emp) {
-        // Saving via repository populates generated ID on the entity instance
-        Employee savedEmp = employeeRepository.save(emp);
-        if (emp != null && savedEmp != null) {
-            emp.setEmpId(savedEmp.getEmpId());
+        Employee saved = employeeRepository.save(emp);
+        if (emp != null && saved != null) {
+            emp.setEmpId(saved.getEmpId());
         }
     }
 

@@ -4,15 +4,10 @@ import com.example.employeemanagementsystem.entity.Department;
 import com.example.employeemanagementsystem.repository.DepartmentRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-/**
- * Implementation of DepartmentDAO interface.
- * Wraps Spring Data JPA DepartmentRepository and EntityManager operations.
- */
 @Repository
 public class DepartmentDAOImpl implements DepartmentDAO {
 
@@ -21,16 +16,15 @@ public class DepartmentDAOImpl implements DepartmentDAO {
     @PersistenceContext
     private EntityManager entityManager;
 
-    @Autowired
     public DepartmentDAOImpl(DepartmentRepository departmentRepository) {
         this.departmentRepository = departmentRepository;
     }
 
     @Override
     public void save(Department dept) {
-        Department savedDept = departmentRepository.save(dept);
-        if (dept != null && savedDept != null) {
-            dept.setDeptId(savedDept.getDeptId());
+        Department saved = departmentRepository.save(dept);
+        if (dept != null && saved != null) {
+            dept.setDeptId(saved.getDeptId());
         }
     }
 

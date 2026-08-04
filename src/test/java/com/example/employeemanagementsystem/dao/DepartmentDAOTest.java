@@ -1,7 +1,6 @@
 package com.example.employeemanagementsystem.dao;
 
 import com.example.employeemanagementsystem.entity.Department;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -21,20 +20,16 @@ class DepartmentDAOTest {
     private DepartmentDAO departmentDAO;
 
     @Test
-    @DisplayName("DepartmentDAO - save, findById, update, delete, and findAll")
     void testDepartmentDAOCRUD() {
-        // 1. Save
         Department dept = new Department("Operations", "Denver");
         departmentDAO.save(dept);
-        assertTrue(dept.getDeptId() > 0, "Generated ID should be assigned");
+        assertTrue(dept.getDeptId() > 0);
 
-        // 2. FindById
         Department found = departmentDAO.findById(dept.getDeptId());
         assertNotNull(found);
         assertEquals("Operations", found.getDeptName());
         assertEquals("Denver", found.getLocation());
 
-        // 3. Update
         found.setLocation("Boulder");
         found.setDeptName("Global Operations");
         departmentDAO.update(found);
@@ -43,13 +38,11 @@ class DepartmentDAOTest {
         assertEquals("Boulder", updated.getLocation());
         assertEquals("Global Operations", updated.getDeptName());
 
-        // 4. FindAll
         List<Department> list = departmentDAO.findAll();
         assertFalse(list.isEmpty());
 
-        // 5. Delete
         departmentDAO.delete(dept.getDeptId());
         Department afterDelete = departmentDAO.findById(dept.getDeptId());
-        assertNull(afterDelete, "Department should be null after deletion");
+        assertNull(afterDelete);
     }
 }
